@@ -38,12 +38,12 @@ bowling_strike_multiplier = config['bowling']['multipliers']['strike']
 
 async def mini_games(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
   keyboard = [
-      [InlineKeyboardButton("Tài Xỉu", callback_data='taixiu'),
-       InlineKeyboardButton("Chẵn Lẻ", callback_data='chanle')],
-      [InlineKeyboardButton("Đoán Số", callback_data='doanso'),
-       InlineKeyboardButton("Slot Machine", callback_data='slot_machine')],
-      [InlineKeyboardButton("Ném Phi Tiêu", callback_data='darts'),
-       InlineKeyboardButton("Bowling", callback_data='bowling')]
+      [InlineKeyboardButton("Tài Xỉu", callback_data='desc_taixiu'),
+       InlineKeyboardButton("Chẵn Lẻ", callback_data='desc_chanle')],
+      [InlineKeyboardButton("Đoán Số", callback_data='desc_doanso'),
+       InlineKeyboardButton("Slot Machine", callback_data='desc_slot_machine')],
+      [InlineKeyboardButton("Ném Phi Tiêu", callback_data='desc_darts'),
+       InlineKeyboardButton("Bowling", callback_data='desc_bowling')]
   ]
   reply_markup = InlineKeyboardMarkup(keyboard)
   await update.message.reply_text("Hãy chọn Game bạn muốn tìm hiểu 👇👇👇", reply_markup=reply_markup)
@@ -56,11 +56,11 @@ async def description(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
   with open('nohu.json', 'r') as file:
     data = json.load(file)
 
-  if query.data.startswith('pot_'):
-    if query.data == 'pot_taixiu':
+  if query.data.startswith('desc_pot_'):
+    if query.data == 'desc_pot_taixiu':
         amount = data.get('taixiu', {}).get('amount', 0)
         text = f"Số tiền trong hũ Tài Xỉu: <b>{format_currency(amount)}</b>"
-    elif query.data == 'pot_slot_machine':
+    elif query.data == 'desc_pot_slot_machine':
         amount = data.get('slot_machine', {}).get('amount', 0)
         text = f"Số tiền trong hũ Slot Machine: <b>{format_currency(amount)}</b>"
     else:
@@ -69,7 +69,7 @@ async def description(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
     return
 
   game_descriptions = {
-      "taixiu": (
+      "desc_taixiu": (
           f"<b>➤ Tài Xỉu Chẵn Lẻ:</b> Game lắc 3 con xúc xắc, nếu tổng của cả 3 xúc xắc từ 3-10 thì là Xỉu, từ 11-18 thì là Tài. Người chơi ăn tiền dựa trên cược của mình\n"
           f"<b>📌 Tỉ lệ:</b> x{taixiu_multiplier} (tài/xỉu) | x{taixiu_chanle_multiplier} (tài/xỉu chẵn lẻ)\n"
           f"<b>➡️ Cược tối thiểu:</b> {format_currency(taixiu_min_bet)}\n"
@@ -83,7 +83,7 @@ async def description(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
           f"T               |      11 -> 18     |    x{taixiu_multiplier}\n"
           f"X               |      3  -> 10     |    x{taixiu_multiplier}"
       ),
-      "chanle": (
+      "desc_chanle": (
           f"<b>➤ Chẵn Lẻ:</b> Game lắc 1 con xúc xắc, người chơi sẽ cược số nút trên xúc xắc là chẵn hay lẻ. Người chơi ăn tiền dựa trên cược của mình\n"
           f"<b>📌 Tỉ lệ:</b> x{chanle_multiplier}\n"
           f"<b>➡️ Cược tối thiểu:</b> {format_currency(chanle_min_bet)}\n"
@@ -93,14 +93,14 @@ async def description(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
           f"C               |     2,4,6          |    x{chanle_multiplier}\n"
           f"L               |      1,3,5          |    x{chanle_multiplier}"
       ),
-      "doanso": (
+      "desc_doanso": (
           f"<b>➤ Đoán Số:</b> Game lắc 1 con xúc xắc, người chơi sẽ cược số nút trên xúc xắc. Người chơi ăn tiền dựa trên cược của mình\n"
           f"<b>📌 Tỉ lệ:</b> x{doanso_multiplier}\n"
           f"<b>➡️ Cược tối thiểu:</b> {format_currency(doanso_min_bet)}\n"
           f"<b>🎮 Cú pháp:</b> <code>/doanso [số nút] [tiền cược]</code>\n"
           f"VD: <code>/doanso 6 10000</code>"
       ),
-      "slot_machine": (
+      "desc_slot_machine": (
           f"<b>➤ Slot Machine:</b> Game sử dụng máy đánh bài để quay kết quả, có 4 icon: số 7, chùm nho, quả chanh, bar\n"
           f"<b>📌 Three of a Kind:</b> Quay ra 3 icon giống nhau. Tiền thưởng sẽ x{three_of_a_kind_multiplier}\n"
           f"<b>📌 Double Seven:</b> Quay ra 2 icon số 7 nằm đầu tiên. Tiền thưởng sẽ x{double_seven_multiplier}\n"
@@ -116,7 +116,7 @@ async def description(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
           f"🍇🍇🍇                     |    x{three_of_a_kind_multiplier}\n"
           f"BAR BAR BAR            |    x{three_of_a_kind_multiplier}"
       ),
-      "darts": (
+      "desc_darts": (
           f"<b>➤ Ném Phi Tiêu:</b> Ném ra 1 phi tiêu vào bia. Người chơi sẽ đoán ném vào vòng trắng hay đỏ. Nếu ném vào hồng tâm và đoán màu đỏ sẽ nhận x{darts_multiplier_aim} tiền thưởng, nếu ném trượt sẽ mất hết\n"
           f"<b>🎮 Cú pháp:</b> <code>/darts [T/D] [tiền cược]</code>\n"
           f"<b>➡️ Cược tối thiểu:</b> {format_currency(darts_min_bet)}\n"
@@ -126,7 +126,7 @@ async def description(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
           f"D               |    Vòng Đỏ       |    x{darts_multiplier}\n"
           f"D               |  Tâm Của Bia  |   x{darts_multiplier_aim}"
       ),
-      "bowling": (
+      "desc_bowling": (
           f"<b>➤ Bowling:</b> Ném 1 quả bóng Bowling vào 7 Ki gỗ. Người chơi đoán số Ki gỗ không bị ngã. Nếu ném trượt sẽ mất hết, nếu ném đổ toàn bộ và đoán số Ki gỗ còn lại là chẵn sẽ nhận x3 tiền thưởng\n"
           f"<b>🎮 Cú pháp:</b> <code>/bowling [bc/bl/bt/bx] [tiền cược]</code>\n"
           f"<b>➡️ Cược tối thiểu:</b> {format_currency(bowling_min_bet)}\n"
@@ -146,8 +146,8 @@ async def description(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
 
 async def pot(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
   keyboard = [
-      [InlineKeyboardButton("Tài Xỉu", callback_data='pot_taixiu')],
-      [InlineKeyboardButton("Slot Machine", callback_data='pot_slot_machine')]
+      [InlineKeyboardButton("Tài Xỉu", callback_data='desc_pot_taixiu')],
+      [InlineKeyboardButton("Slot Machine", callback_data='desc_pot_slot_machine')]
   ]
 
   reply_markup = InlineKeyboardMarkup(keyboard)

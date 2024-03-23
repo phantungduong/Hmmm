@@ -16,11 +16,13 @@ from function import load_config, format_currency, update_user_info, get_user_in
 
 from commands import pot, help_command, leaderboard, trutien, congtien, profile, money, deleteaccount, listcode, chuyentien, taocode, giftcode, register, mini_games, description
 
+from slot import naptien, button_handler, clean_name, remove_banking_request, update_balance, save_banking_data, check_banking_status, update_banking_status
+
 from message import encouragements
 
 vietnam_tz = pytz.timezone('Asia/Ho_Chi_Minh')
 
-current_time = datetime.now(vietnam_tz).strftime("%H:%M:%S %d-%m-%Y")
+current_time = datetime.now(vietnam_tz).strftime('%H:%M:%S %d-%m-%Y')
 
 config = load_config()
 
@@ -42,6 +44,17 @@ darts_multiplier_aim = config['darts']['multipliers']['aim']
 bowling_min_bet = config['bowling']['min_bet']
 bowling_tai_xiu_chan_le_multiplier = config['bowling']['multipliers']['bowling_tai_xiu_chan_le']
 bowling_strike_multiplier = config['bowling']['multipliers']['strike']
+
+
+async def main_callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+  query = update.callback_query
+  data = query.data
+
+  if data.startswith("bank:"):
+      await button_handler(update, context)
+  elif data.startswith("desc_"):
+      await description(update, context)
+
 
 
 
@@ -249,7 +262,7 @@ async def slot(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
           f"┣➤ TIỀN CƯỢC: {format_currency(bet_money)}\n"
           f"┣➤ KẾT QUẢ: {result_message}\n"
           f"┣➤ TIỀN THẮNG: {format_currency(win_money)}\n"
-          f"┣➤ THỜI GIAN: {current_time}\n"
+          f"┣➤ THỜI GIAN: {datetime.now(vietnam_tz).strftime('%H:%M:%S %d-%m-%Y')}\n"
           f"┗━━━━━━━━━━━━━┛"
       )
       await update.message.reply_text(winning_message,parse_mode='HTML')
@@ -347,7 +360,7 @@ async def taixiu(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
             f"┣➤ CƯỢC: {choice}\n"
             f"┣➤ TIỀN CƯỢC: {bet_money:,} VNĐ\n"
             f"┣➤ KẾT QUẢ: {'-'.join(map(str, dice_values))} | {result} {result_icon}\n"                       f"┣➤ TIỀN THẮNG: {winnings:,} VNĐ\n"
-            f"┣➤ THỜI GIAN: {current_time}\n"
+            f"┣➤ THỜI GIAN: {datetime.now(vietnam_tz).strftime('%H:%M:%S %d-%m-%Y')}\n"
             f"┗━━━━━━━━━━━━━┛"
           )
 
@@ -360,7 +373,7 @@ async def taixiu(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
             f"┣➤ TIỀN CƯỢC: {bet_money:,} VNĐ\n"
             f"┣➤ KẾT QUẢ: {'-'.join(map(str, dice_values))} | {result} {result_icon}\n"   
             f"┣➤ TIỀN THUA: {bet_money:,} VNĐ\n"
-            f"┣➤ THỜI GIAN: {current_time}\n"
+            f"┣➤ THỜI GIAN: {datetime.now(vietnam_tz).strftime('%H:%M:%S %d-%m-%Y')}\n"
             f"┗━━━━━━━━━━━━━┛"
           )
 
@@ -420,7 +433,7 @@ async def chanle(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
                 f"┣➤ TỈ LỆ: {chanle_multiplier}\n"
                 f"┣➤ KẾT QUẢ: {total_value} ({result})\n"
                 f"┣➤ TIỀN THẮNG: {winnings:,} VNĐ\n"
-                f"┣➤ THỜI GIAN: {current_time}\n"
+                f"┣➤ THỜI GIAN: {datetime.now(vietnam_tz).strftime('%H:%M:%S %d-%m-%Y')}\n"
                 "┗━━━━━━━━━━━━━┛"
               )
 
@@ -434,7 +447,7 @@ async def chanle(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
                 f"┣➤ TỈ LỆ: {chanle_multiplier}\n"
                 f"┣➤ KẾT QUẢ: {total_value} ({result})\n"
                 f"┣➤ TIỀN THUA: {money:,} VNĐ\n"
-                f"┣➤ THỜI GIAN: {current_time}\n"
+                f"┣➤ THỜI GIAN: {datetime.now(vietnam_tz).strftime('%H:%M:%S %d-%m-%Y')}\n"
                 "┗━━━━━━━━━━━━━┛"
               )
 
@@ -497,7 +510,7 @@ async def doanso(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
                   f"┣➤ TỈ LỆ: {doanso_multiplier}\n"
                   f"┣➤ KẾT QUẢ: {dice_value}\n"
                   f"┣➤ TIỀN THẮNG: {winnings:,} VNĐ\n"
-                  f"┣➤ THỜI GIAN: {current_time}\n"
+                  f"┣➤ THỜI GIAN: {datetime.now(vietnam_tz).strftime('%H:%M:%S %d-%m-%Y')}\n"
                   "┗━━━━━━━━━━━━━┛"
               )
 
@@ -512,7 +525,7 @@ async def doanso(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
                 f"┣➤ TỈ LỆ: {doanso_multiplier}\n"
                 f"┣➤ KẾT QUẢ: {dice_value}\n"
                 f"┣➤ TIỀN THUA: {money:,} VNĐ\n"
-                f"┣➤ THỜI GIAN: {current_time}\n"
+                f"┣➤ THỜI GIAN: {datetime.now(vietnam_tz).strftime('%H:%M:%S %d-%m-%Y')}\n"
                 "┗━━━━━━━━━━━━━┛"
               )
 
@@ -555,7 +568,6 @@ async def display_session_info(update, context, session, result, total_value, di
   total_players = len(session["user_bets"])
   total_bets = sum(sum(user_info["bets"].values()) for user_info in session["user_bets"].values())
   session_id = random.randint(1111, 99999)
-  now = datetime.now()
   result_formatted = translate_bet_type(result)
   result_icon = "⚪️" if result_formatted == "Tài" else "⚫️"
 
@@ -565,7 +577,7 @@ async def display_session_info(update, context, session, result, total_value, di
       f"┣➤ SỐ NGƯỜI CHƠI: {total_players}\n"
       f"┣➤ TỔNG TIỀN CƯỢC: {format_currency(total_bets)}\n"
       f"┣➤ KẾT QUẢ: {'-'.join(map(str, dice_values))} | {result_formatted} {result_icon}\n"
-      f"┣➤ THỜI GIAN: {current_time}\n"
+      f"┣➤ THỜI GIAN: {datetime.now(vietnam_tz).strftime('%H:%M:%S %d-%m-%Y')}\n"
       f"┗━━━━━━━━━━━━━┛"
   )
 
@@ -574,7 +586,7 @@ async def display_session_info(update, context, session, result, total_value, di
 
 async def schedule_summarize(update: Update, context: ContextTypes.DEFAULT_TYPE):
   # Thời gian cược tổng cộng là 60 giây
-  total_time = 60
+  total_time =60
   # Thời gian thông báo là mỗi 10 giây
   notify_interval = 10
   chat_id = update.effective_chat.id
@@ -635,14 +647,14 @@ async def bet(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
           await update.message.reply_text(f'Bạn chỉ còn {remaining_balance}, không thể cược số tiền lớn hơn số dư của bạn ❌',parse_mode='HTML')
           return
 
-      user_info['balance'] -= bet_amount
-      update_user_info(user_id, user_info['balance'])
-
       user_bets = session["user_bets"].get(user_id, {"name": user_full_name, "bets": {"T": 0, "X": 0}})
 
       if (bet_type == "T" and user_bets["bets"]["X"] > 0) or (bet_type == "X" and user_bets["bets"]["T"] > 0):
           await update.message.reply_text('Chỉ đặt cược 1 cửa trong cùng 1 phiên ‼️')
           return
+
+      user_info['balance'] -= bet_amount
+      update_user_info(user_id, user_info['balance'])
 
       result_formatted = translate_bet_type(bet_type)
       user_bets["bets"][bet_type] += bet_amount
@@ -798,11 +810,35 @@ def main():
   app.add_handler(CommandHandler("bowling", bowling))
   app.add_handler(CommandHandler("pot", pot))
   app.add_handler(CommandHandler("game", mini_games))
-  app.add_handler(CallbackQueryHandler(description))
   app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, bet))
+  app.add_handler(CommandHandler("naptien", naptien))
+  app.add_handler(CallbackQueryHandler(main_callback_handler))
   
   app.run_polling()
 
 if __name__ == '__main__':
-  print('OK NHA')
+  print('KHÔNG BUG KHÔNG BUG KHÔNG BUG')
   main()
+
+#                       _oo0oo_
+#                      o8888888o
+#                      88" . "88
+#                      (| -_- |)
+#                      0\  =  /0
+#                    ___/`---'\___
+#                  .' \\|     |// '.
+#                 / \\|||  :  |||// \
+#                / _||||| -:- |||||- \
+#               |   | \\\  -  /// |   |
+#               | \_|  ''\---/''  |_/ |
+#               \  .-\__  '-'  ___/-. /
+#             ___'. .'  /--.--\  `. .'___
+#          ."" '<  `.___\_<|>_/___.' >' "".
+#         | | :  `- \`.;`\ _ /`;.`/ - ` : | |
+#         \  \ `_.   \_ __\ /__ _/   .-` /  /
+#     =====`-.____`.___ \_____/___.-`___.-'=====
+#                       `=---='
+#
+#     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#            Phật phù hộ, không bao giờ BUG
+#     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
